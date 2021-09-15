@@ -2,3 +2,4 @@
 *.properties
 */logs/*
 .DS_Store
+SetProperty.java
