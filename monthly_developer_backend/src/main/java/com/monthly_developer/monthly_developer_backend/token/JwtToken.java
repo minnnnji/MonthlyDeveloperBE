@@ -1,6 +1,7 @@
 package com.monthly_developer.monthly_developer_backend.token;
 
 
+import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.service.UserService;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,32 +20,47 @@ public class JwtToken {
 
     private String secretKey = "null";
 
-    @PostConstruct
-    protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
-
     private final UserService userDetailsService;
 
     public JwtToken(UserService userDetailsService) {
         this.userDetailsService = userDetailsService;
+        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     // 토큰 생성
-    public String createToken(String userPk, List<String> roles) {
+    public UserTokens createAllTokens(String userEmail, List<String> roles) {
 
         // 유효시간 1분으로 설정
-        long tokenValidTime = 60 * 1000L;
+        long accessTokenValidTime = 60 * 1000L;
+        long refreshTokenValidTime = 120 * 1000L;
 
-        Claims claims = Jwts.claims().setSubject(userPk);
-        claims.put("roles", roles);
         Date now = new Date();
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now) // 토큰 발행 시간
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // 토큰 만료 시간
-                .signWith(SignatureAlgorithm.HS256, secretKey)  // 암호화 방식
-                .compact();
+
+        UserTokens userTokens = new UserTokens();
+
+        String accessToken = createToken(userEmail, roles, accessTokenValidTime, now).compact();
+        String refreshToken = createToken(userEmail, roles, refreshTokenValidTime, now).compact();
+
+        userTokens.setAccessToken(accessToken);
+        userTokens.setRefreshToken(refreshToken);
+
+        return userTokens;
+    }
+
+    private JwtBuilder createToken(String userEmail, List<String> roles, long accessTokenValidTime, Date now) {
+        Claims claims = Jwts.claims();
+        claims.setSubject(userEmail);
+        claims.put("roles", roles);
+
+        JwtBuilder newToken = Jwts.builder();
+        newToken.setHeaderParam("typ", "JWT");
+
+        newToken.setSubject(userEmail);
+        newToken.setIssuedAt(now);
+        newToken.setExpiration(new Date(now.getTime() + accessTokenValidTime));
+        newToken.signWith(SignatureAlgorithm.HS256, secretKey);
+
+        return newToken;
     }
 
     // 정보 조회
