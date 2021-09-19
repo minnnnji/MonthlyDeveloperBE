@@ -1,9 +1,11 @@
 package com.monthly_developer.monthly_developer_backend.controller;
 
+import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import com.monthly_developer.monthly_developer_backend.model.user.User;
-import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,18 +41,25 @@ public class AuthorityController {
 
     // 로그인
     @PostMapping("/login")
-    public UserTokens login(@RequestBody Map<String, String> user) {
+    public ResponseEntity<ResponseMessage> login(@RequestBody User user, HttpServletRequest request) throws Exception {
 
-        User loginUser = userRepository.findByEmail(user.get("email"))
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setRequestPath(request.getRequestURI());
+
+        User loginUser = userRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException(""));
-        if (user.get("password").equals(loginUser.getPassword())) {
-            return jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles());
+        if (user.getPassword().equals(loginUser.getPassword())) {
+
+            responseMessage.setRequestResult("success");
+            responseMessage.setData(jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles()));
+
+            return new ResponseEntity<>(responseMessage, HttpStatus.OK);
         }
         else{
-            UserTokens userTokens = new UserTokens();
-            userTokens.setAccessToken("Fail!");
-            userTokens.setRefreshToken("Fail!");
-            return userTokens;
+            responseMessage.setRequestResult("fail");
+            responseMessage.setData(null);
+
+            return new ResponseEntity<>(responseMessage, HttpStatus.OK);
         }
     }
 
@@ -59,5 +68,12 @@ public class AuthorityController {
         System.out.println("Access Token");
         System.out.println(jwtToken.validateToken(tokens.get("accessToken")));
         System.out.println(jwtToken.validateToken(tokens.get("refreshToken")));
+
+        try{
+            System.out.println(jwtToken.getUserPk(tokens.get("accessToken")));
+        }catch (io.jsonwebtoken.SignatureException e){
+            System.out.println("검증 오류!");
+        }
+
     }
 }

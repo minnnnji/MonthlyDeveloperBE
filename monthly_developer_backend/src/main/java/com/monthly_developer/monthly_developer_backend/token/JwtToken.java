@@ -48,24 +48,33 @@ public class JwtToken {
     }
 
     private JwtBuilder createToken(String userEmail, List<String> roles, long accessTokenValidTime, Date now) {
-        Claims claims = Jwts.claims();
-        claims.setSubject(userEmail);
-        claims.put("roles", roles);
 
         JwtBuilder newToken = Jwts.builder();
         newToken.setHeaderParam("typ", "JWT");
 
-        newToken.setSubject(userEmail);
-        newToken.setIssuedAt(now);
-        newToken.setExpiration(new Date(now.getTime() + accessTokenValidTime));
-        newToken.signWith(SignatureAlgorithm.HS256, secretKey);
+        if (userEmail == null){
+
+        }else {
+
+
+            Claims claims = Jwts.claims();
+            claims.setSubject("user_auth");
+            claims.setAudience(userEmail);
+            claims.setIssuedAt(now);
+            claims.setExpiration(new Date(now.getTime() + accessTokenValidTime));
+            claims.put("roles", roles);
+
+            newToken.setClaims(claims).signWith(SignatureAlgorithm.HS256, secretKey);
+        }
+
+
 
         return newToken;
     }
 
     // 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUserPk(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserPk(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
