@@ -27,51 +27,52 @@ public class AuthorityController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/join")
-    public void join(@RequestBody User user) {
-        // 회원 가입은 기본 권한으로 가입
-        userRepository.save(
-                User.builder()
-                        .email(user.getEmail())
-                        .password(user.getPassword())
-                        .roles(Collections.singletonList("ROLE_USER"))
-                        .build());
-
-    }
-
-    // 로그인
-    @PostMapping("/login")
-    public ResponseEntity<ResponseMessage> login(@RequestBody User user, HttpServletRequest request) throws Exception {
+    @PostMapping("/join/user")
+    public ResponseEntity<ResponseMessage> join(@RequestBody User user, HttpServletRequest request) {
 
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
         User loginUser = userRepository.findByEmail(user.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException(""));
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(user.getEmail())
+                            .password(user.getPassword())
+                            .roles(Collections.singletonList("ROLE_USER"))
+                            .build();
+
+                    // 회원 가입은 기본 권한으로 가입
+                    userRepository.save(newUser);
+
+                    return newUser;
+                });
+
         if (user.getPassword().equals(loginUser.getPassword())) {
 
             responseMessage.setRequestResult("success");
             responseMessage.setData(jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles()));
 
             return new ResponseEntity<>(responseMessage, HttpStatus.OK);
-        }
-        else{
+        } else {
             responseMessage.setRequestResult("fail");
             responseMessage.setData(null);
 
             return new ResponseEntity<>(responseMessage, HttpStatus.OK);
         }
+
+
     }
 
+
     @GetMapping("/validate")
-    public void validate(@RequestBody Map<String, String> tokens){
+    public void validate(@RequestBody Map<String, String> tokens) {
         System.out.println("Access Token");
         System.out.println(jwtToken.validateToken(tokens.get("accessToken")));
         System.out.println(jwtToken.validateToken(tokens.get("refreshToken")));
 
-        try{
+        try {
             System.out.println(jwtToken.getUserPk(tokens.get("accessToken")));
-        }catch (io.jsonwebtoken.SignatureException e){
+        } catch (io.jsonwebtoken.SignatureException e) {
             System.out.println("검증 오류!");
         }
 
