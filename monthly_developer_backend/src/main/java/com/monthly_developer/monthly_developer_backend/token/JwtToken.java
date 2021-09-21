@@ -55,8 +55,6 @@ public class JwtToken {
         if (userEmail == null){
 
         }else {
-
-
             Claims claims = Jwts.claims();
             claims.setSubject("user_auth");
             claims.setAudience(userEmail);
@@ -74,13 +72,13 @@ public class JwtToken {
 
     // 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserPk(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserInfo(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     // 정보 추출
-    public String getUserPk(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    public String getUserInfo(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getAudience();
     }
 
     // Header에서 token 가져오기
