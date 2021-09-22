@@ -9,6 +9,7 @@ import com.monthly_developer.monthly_developer_backend.repository.UserRepository
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,30 +68,43 @@ public class AuthorityController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<ResponseMessage> reissueToken(@RequestBody UserTokens userTokens, HttpServletRequest request){
+    public ResponseEntity<ResponseMessage> reissueToken(@RequestBody UserTokens userTokens, HttpServletRequest request) {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
-        if(jwtToken.validateToken(userTokens.getAccessToken())){
+        //        // ID
+        //        System.out.println(token.getPrincipal());
+        //        // PW
+        //        System.out.println(token.getCredentials());
+        //        // Detail
+        //        System.out.println(token.getDetails());
+        //        // Auth
+        //        System.out.println(token.getAuthorities());
+        //
+        //        System.out.println();
+        //
+        //        System.out.println(token.getName());
+
+        // 유효한 토큰 확인
+        try {
+            Authentication token = jwtToken.getAuthentication(userTokens.getAccessToken());
             responseMessage.setRequestResult("fail");
             responseMessage.setData("Access Token is not expired.");
-        }else{
-            try{
-                String mail = jwtToken.getUserInfo(userTokens.getAccessToken());
-
-                // 사인 오류
-            }catch (io.jsonwebtoken.SignatureException e){
-                responseMessage.setRequestResult("fail");
-                responseMessage.setData("SignatureException");
-            }catch (io.jsonwebtoken.MalformedJwtException e){
-                responseMessage.setRequestResult("fail");
-                responseMessage.setData("MalformedJwtException");
-            }catch (io.jsonwebtoken.ExpiredJwtException e){
-                responseMessage.setRequestResult("success");
-                responseMessage.setData("Expired!");
-            }
-
+            // 사인 오류
+        } catch (io.jsonwebtoken.SignatureException e) {
+            responseMessage.setRequestResult("fail");
+            responseMessage.setData("SignatureException");
+            // 파싱 오류
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            responseMessage.setRequestResult("fail");
+            responseMessage.setData("MalformedJwtException");
+            // 타임 아웃
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            responseMessage.setRequestResult("success");
+            responseMessage.setData("Expired!");
         }
+
+
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
 
