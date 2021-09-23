@@ -10,13 +10,16 @@ import com.monthly_developer.monthly_developer_backend.token.JwtToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -100,8 +103,28 @@ public class AuthorityController {
             responseMessage.setData("MalformedJwtException");
             // 타임 아웃
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            responseMessage.setRequestResult("success");
-            responseMessage.setData("Expired!");
+
+            try {
+                Authentication token = jwtToken.getAuthentication(userTokens.getRefreshToken());
+                responseMessage.setRequestResult("success");
+
+                User userInfo = (User) token.getPrincipal();
+                responseMessage.setData(jwtToken.createAllTokens(userInfo.getEmail(), userInfo.getRoles()));
+
+            } catch (io.jsonwebtoken.SignatureException ie) {
+                responseMessage.setRequestResult("fail");
+                responseMessage.setData("SignatureException");
+                // 파싱 오류
+            } catch (io.jsonwebtoken.MalformedJwtException ie) {
+                responseMessage.setRequestResult("fail");
+                responseMessage.setData("MalformedJwtException");
+                // 타임 아웃
+            } catch (io.jsonwebtoken.ExpiredJwtException ie) {
+                responseMessage.setRequestResult("fail");
+                responseMessage.setData("All Token Time out!");
+            }
+
+
         }
 
 
