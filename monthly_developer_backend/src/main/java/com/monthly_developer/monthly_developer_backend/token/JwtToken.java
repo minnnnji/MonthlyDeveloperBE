@@ -4,6 +4,7 @@ package com.monthly_developer.monthly_developer_backend.token;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.service.UserService;
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,10 +21,15 @@ public class JwtToken {
 
     private String secretKey = "null";
 
-    private final UserService userDetailsService;
+    private UserService userDetailsService;
 
-    public JwtToken(UserService userDetailsService) {
+    @Autowired
+    public void setUserDetailsService(UserService userDetailsService){
         this.userDetailsService = userDetailsService;
+    }
+
+
+    public JwtToken() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
@@ -64,8 +70,6 @@ public class JwtToken {
 
             newToken.setClaims(claims).signWith(SignatureAlgorithm.HS256, secretKey);
         }
-
-
 
         return newToken;
     }
