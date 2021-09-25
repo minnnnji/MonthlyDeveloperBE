@@ -1,11 +1,9 @@
 package com.monthly_developer.monthly_developer_backend.service;
 
-import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,15 +17,12 @@ import java.util.Map;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private JwtToken jwtToken;
+    private final JwtToken jwtToken;
 
-    @Autowired
-    public void setJwtToken(JwtToken jwtToken){
-        this.jwtToken = jwtToken;
-    }
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, JwtToken jwtToken) {
         this.userRepository = userRepository;
+        this.jwtToken = jwtToken;
     }
 
     public Map<String, Object> joinUser(User user){

@@ -1,16 +1,16 @@
 package com.monthly_developer.monthly_developer_backend.token;
 
 
+import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
-import com.monthly_developer.monthly_developer_backend.service.UserService;
+import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
@@ -20,16 +20,10 @@ import java.util.List;
 public class JwtToken {
 
     private String secretKey = "null";
+    private final UserRepository userRepository;
 
-    private UserService userDetailsService;
-
-    @Autowired
-    public void setUserDetailsService(UserService userDetailsService){
-        this.userDetailsService = userDetailsService;
-    }
-
-
-    public JwtToken() {
+    public JwtToken(UserRepository userRepository) {
+        this.userRepository = userRepository;
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
@@ -76,8 +70,13 @@ public class JwtToken {
 
     // 정보 조회
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUserInfo(token));
+        UserDetails userDetails = loadUserByUsername(getUserInfo(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    private User loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
+                .orElseThrow(()-> new UsernameNotFoundException("사용자를 찾을 수 없음"));
     }
 
     // 정보 추출
