@@ -20,10 +20,8 @@ import java.util.List;
 public class JwtToken {
 
     private String secretKey = "null";
-    private final UserRepository userRepository;
 
-    public JwtToken(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public JwtToken() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
@@ -69,14 +67,8 @@ public class JwtToken {
     }
 
     // 정보 조회
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = loadUserByUsername(getUserInfo(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    private User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
-                .orElseThrow(()-> new UsernameNotFoundException("사용자를 찾을 수 없음"));
+    public Authentication getAuthentication(User user) {
+        return new UsernamePasswordAuthenticationToken(user, "", user.getAuthorities());
     }
 
     // 정보 추출
@@ -84,12 +76,6 @@ public class JwtToken {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getAudience();
     }
 
-    // Header에서 token 가져오기
-    public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("AUTH-TOKEN");
-    }
-
-    // 토큰의 유효성 확인
     // 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {

@@ -80,7 +80,10 @@ public class UserService implements UserDetailsService {
         //        System.out.println(token.getName());
 
         try {
-            Authentication token = jwtToken.getAuthentication(userTokens.getAccessToken());
+            String userAudience = jwtToken.getUserInfo(userTokens.getAccessToken());
+            User requestUser = loadUserByUsername(userAudience);
+            Authentication token = jwtToken.getAuthentication(requestUser);
+
             _result = "fail";
             _data = "Access Token is not expired.";
 
@@ -98,8 +101,10 @@ public class UserService implements UserDetailsService {
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
 
             try {
+                String userAudience = jwtToken.getUserInfo(userTokens.getRefreshToken());
+                User requestUser = loadUserByUsername(userAudience);
+                Authentication token = jwtToken.getAuthentication(requestUser);
 
-                Authentication token = jwtToken.getAuthentication(userTokens.getRefreshToken());
                 User userInfo = (User) token.getPrincipal();
 
                 _result = "success";
@@ -125,7 +130,7 @@ public class UserService implements UserDetailsService {
 
         String final_result = _result;
         Object final_data = _data;
-        return new HashMap<String, Object>() {{
+        return new HashMap() {{
             put("result", final_result);
             put("data", final_data);
         }};
