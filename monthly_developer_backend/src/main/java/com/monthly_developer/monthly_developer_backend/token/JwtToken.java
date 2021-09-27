@@ -3,26 +3,22 @@ package com.monthly_developer.monthly_developer_backend.token;
 
 import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
-import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import io.jsonwebtoken.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
-@Component
+
 public class JwtToken {
 
-    private String secretKey = "null";
+    private final String secretKey;
 
-    public JwtToken() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    public JwtToken(String secretKey) {
+        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     // 토큰 생성
