@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-// Security 활성화 후 Swagger 페이지 접근을 위해 Swagger를 Security 무시 목록 추가
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtToken jwtToken;
