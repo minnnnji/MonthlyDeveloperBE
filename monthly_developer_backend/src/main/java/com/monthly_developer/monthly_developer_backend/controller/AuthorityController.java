@@ -55,4 +55,9 @@ public class AuthorityController {
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
 
+    @GetMapping("/user/test")
+    public String userTest(){
+        return "user!";
+    }
+
 }

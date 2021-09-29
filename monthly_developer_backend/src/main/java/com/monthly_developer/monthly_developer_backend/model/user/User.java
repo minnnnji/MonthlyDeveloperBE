@@ -26,6 +26,11 @@ public class User implements UserDetails {
 
     private String password;
 
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
 
     public String getEmail() {
         return email;

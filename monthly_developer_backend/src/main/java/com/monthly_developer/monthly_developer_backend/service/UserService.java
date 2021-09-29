@@ -45,8 +45,19 @@ public class UserService implements UserDetailsService {
                 });
 
         if (user.getPassword().equals(loginUser.getPassword())) {
+
+            UserTokens _token = jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles());
+
             _result = "success";
-            _data = jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles());
+            User newUser = User.builder()
+                    .email(user.getEmail())
+                    .password(user.getPassword())
+                    .roles(loginUser.getRoles())
+                    .token(_token.getRefreshToken())
+                    .build();
+
+            userRepository.save(newUser);
+            _data = _token;
 
         } else {
             _result = "fail";
