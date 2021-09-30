@@ -4,6 +4,9 @@ import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -99,27 +102,30 @@ public class UserService implements UserDetailsService {
             _data = "Access Token is not expired.";
 
             // 사인 오류
-        } catch (io.jsonwebtoken.SignatureException e) {
+
+        } catch (SignatureException e) {
             _result = "fail";
             _data = "SignatureException";
 
             // 파싱 오류
-        } catch (io.jsonwebtoken.MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             _result = "fail";
             _data = "MalformedJwtException";
 
             // 타임 아웃
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
 
             try {
-                String userAudience = jwtToken.getUserInfo(userTokens.getRefreshToken());
-                User requestUser = loadUserByUsername(userAudience);
-                Authentication token = jwtToken.getAuthentication(requestUser);
+                String expiredUserMail = e.getClaims().getAudience();
+                User requestUser = loadUserByUsername(expiredUserMail);
 
-                User userInfo = (User) token.getPrincipal();
-
-                _result = "success";
-                _data = jwtToken.createAllTokens(userInfo.getEmail(), userInfo.getRoles());
+                if (requestUser.getToken().equals(userTokens.getRefreshToken())){
+                    _result = "success";
+                    _data = jwtToken.createAllTokens(requestUser.getEmail(), requestUser.getRoles());
+                }else{
+                    _result = "fail!";
+                    _data = "Unknown Token!";
+                }
 
             } catch (io.jsonwebtoken.SignatureException ie) {
                 _result = "fail";
