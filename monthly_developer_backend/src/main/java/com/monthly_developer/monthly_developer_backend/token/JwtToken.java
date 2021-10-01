@@ -32,8 +32,8 @@ public class JwtToken {
 
         UserTokens userTokens = new UserTokens();
 
-        String accessToken = createToken(userEmail, roles, accessTokenValidTime, now).compact();
-        String refreshToken = createToken(userEmail, roles, refreshTokenValidTime, now).compact();
+        String accessToken = createToken(userEmail, false, roles, accessTokenValidTime, now).compact();
+        String refreshToken = createToken(userEmail, true, roles, refreshTokenValidTime, now).compact();
 
         userTokens.setAccessToken(accessToken);
         userTokens.setRefreshToken(refreshToken);
@@ -41,7 +41,7 @@ public class JwtToken {
         return userTokens;
     }
 
-    private JwtBuilder createToken(String userEmail, List<String> roles, long accessTokenValidTime, Date now) {
+    private JwtBuilder createToken(String userEmail, boolean type, List<String> roles, long accessTokenValidTime, Date now) {
 
         JwtBuilder newToken = Jwts.builder();
         newToken.setHeaderParam("typ", "JWT");
@@ -50,8 +50,13 @@ public class JwtToken {
 
         }else {
             Claims claims = Jwts.claims();
-            claims.setSubject("user_auth");
-            claims.setAudience(userEmail);
+            if (type){
+                claims.setSubject("user_refresh_auth");
+            }else{
+                claims.setSubject("user_auth");
+                claims.setAudience(userEmail);
+            }
+
             claims.setIssuedAt(now);
             claims.setExpiration(new Date(now.getTime() + accessTokenValidTime));
             claims.put("roles", roles);
