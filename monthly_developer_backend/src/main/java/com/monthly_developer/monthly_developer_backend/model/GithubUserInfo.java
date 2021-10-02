@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GithubUserInfo {
 
-    private String avatarUrl;
-    private String login;
     private String email;
+    private String login;
+    private String avatarUrl;
     private String name;
 
     @Override

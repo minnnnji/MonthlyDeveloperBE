@@ -13,15 +13,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class MdbService {
+public class OauthService {
 
     private final SetProperty setProperty;
 
-    public MdbService(SetProperty setProperty) {
+    public OauthService(SetProperty setProperty) {
         this.setProperty = setProperty;
     }
 
-    public void getUserInfo(String code){
+    public GithubUserInfo getUserInfo(String code){
 
         GithubAccessToken githubAccessToken = getAccessToken(code);
 
@@ -37,11 +37,11 @@ public class MdbService {
                 httpEntity,
                 GithubUserInfo.class);
 
-        System.out.println(res);
+        return res.getBody();
 
     }
 
-    public GithubAccessToken getAccessToken(String code){
+    private GithubAccessToken getAccessToken(String code){
 
         GithubAccessToken token = new GithubAccessToken();
 
@@ -61,7 +61,6 @@ public class MdbService {
                 httpEntity,
                 GithubAccessToken.class);
 
-        System.out.println(res.getBody());
         token = res.getBody();
 
         return token;
