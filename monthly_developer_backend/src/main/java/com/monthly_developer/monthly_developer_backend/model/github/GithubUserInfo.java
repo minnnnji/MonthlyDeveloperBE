@@ -1,4 +1,4 @@
-package com.monthly_developer.monthly_developer_backend.model;
+package com.monthly_developer.monthly_developer_backend.model.github;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

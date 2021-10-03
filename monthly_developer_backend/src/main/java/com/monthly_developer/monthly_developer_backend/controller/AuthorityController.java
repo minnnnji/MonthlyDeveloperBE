@@ -1,12 +1,11 @@
 package com.monthly_developer.monthly_developer_backend.controller;
 
-import com.monthly_developer.monthly_developer_backend.model.GithubUserInfo;
+import com.monthly_developer.monthly_developer_backend.model.github.GithubAccessCode;
+import com.monthly_developer.monthly_developer_backend.model.github.GithubUserInfo;
 import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
-import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.service.OauthService;
 import com.monthly_developer.monthly_developer_backend.service.UserService;
-import com.monthly_developer.monthly_developer_backend.token.JwtToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +24,14 @@ public class AuthorityController {
         this.oauthService = oauthService;
     }
 
-    @GetMapping("/join/user")
-    public ResponseEntity<ResponseMessage> join(@RequestParam String accessCode, HttpServletRequest request) {
+    @PostMapping("/join")
+    public ResponseEntity<ResponseMessage> join(@RequestBody GithubAccessCode githubAccessCode, HttpServletRequest request) {
 
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
-        System.out.println(accessCode);
-        GithubUserInfo user = oauthService.getUserInfo(accessCode);
-        System.out.println(user);
+
+        // Get user information from Github
+        GithubUserInfo user = oauthService.getUserInfo(githubAccessCode.getAccessCode());
 
         //Map<String, Object> result = userService.joinUser(user);
         //responseMessage.setRequestResult((String) result.get("result"));

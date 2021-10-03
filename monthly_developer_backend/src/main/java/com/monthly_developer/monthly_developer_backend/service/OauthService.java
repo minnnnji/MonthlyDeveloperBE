@@ -1,8 +1,8 @@
 package com.monthly_developer.monthly_developer_backend.service;
 
 import com.monthly_developer.monthly_developer_backend.config.SetProperty;
-import com.monthly_developer.monthly_developer_backend.model.GithubAccessToken;
-import com.monthly_developer.monthly_developer_backend.model.GithubUserInfo;
+import com.monthly_developer.monthly_developer_backend.model.github.GithubAccessToken;
+import com.monthly_developer.monthly_developer_backend.model.github.GithubUserInfo;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
