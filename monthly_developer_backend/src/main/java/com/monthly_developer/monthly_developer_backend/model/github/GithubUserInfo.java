@@ -2,19 +2,20 @@ package com.monthly_developer.monthly_developer_backend.model.github;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.monthly_developer.monthly_developer_backend.model.user.User;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GithubUserInfo {
 
-    private String email;
     private String login;
-    private String avatarUrl;
+    private String avatar;
+    private String email;
     private String name;
 
     @Override
     public String toString() {
         return "GithubUserInfo{" +
-                "avatarUrl='" + avatarUrl + '\'' +
+                "avatarUrl='" + avatar + '\'' +
                 ", login='" + login + '\'' +
                 ", email='" + email + '\'' +
                 ", name='" + name + '\'' +
@@ -29,12 +30,12 @@ public class GithubUserInfo {
         this.login = login;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatar() {
+        return avatar;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getEmail() {
@@ -51,5 +52,14 @@ public class GithubUserInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public User githubUserToUser(){
+        return User.builder()
+                .login(getLogin())
+                .avatar(getAvatar())
+                .email(getEmail())
+                .name(getName())
+                .build();
     }
 }

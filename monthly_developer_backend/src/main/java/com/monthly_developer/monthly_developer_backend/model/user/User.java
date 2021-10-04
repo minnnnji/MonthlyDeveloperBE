@@ -22,41 +22,59 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
 
     @Id
+    private String login;
+
+    private String avatar;
+
     private String email;
 
-    private String password;
+    private String name;
 
     private String token;
 
-    public String getToken() {
-        return token;
+    // other table
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_login")
+    )
+    private List<String> roles = new ArrayList<>();
+
+    public String getLogin() {
+        return login;
+    }
+
+    public String getAvatar() {
+        return avatar;
     }
 
     public String getEmail() {
         return email;
     }
 
-    @Override
-    public String getPassword() {
-        return password;
+    public String getName() {
+        return name;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public List<String> getRoles() {
         return roles;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<String> roles = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
     }
 
     @Override

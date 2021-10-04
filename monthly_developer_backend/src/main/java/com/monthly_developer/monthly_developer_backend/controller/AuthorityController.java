@@ -32,10 +32,10 @@ public class AuthorityController {
 
         // Get user information from Github
         GithubUserInfo user = oauthService.getUserInfo(githubAccessCode.getAccessCode());
-
-        //Map<String, Object> result = userService.joinUser(user);
-        //responseMessage.setRequestResult((String) result.get("result"));
-        //responseMessage.setData(result.get("data"));
+        System.out.println(user);
+        Map<String, Object> result = userService.joinUser(user.githubUserToUser());
+        responseMessage.setRequestResult((String) result.get("result"));
+        responseMessage.setData(result.get("data"));
 
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
 

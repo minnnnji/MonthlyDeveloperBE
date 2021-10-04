@@ -41,12 +41,12 @@ public class JwtToken {
         return userTokens;
     }
 
-    private JwtBuilder createToken(String userEmail, boolean type, List<String> roles, long accessTokenValidTime, Date now) {
+    private JwtBuilder createToken(String userLogin, boolean type, List<String> roles, long accessTokenValidTime, Date now) {
 
         JwtBuilder newToken = Jwts.builder();
         newToken.setHeaderParam("typ", "JWT");
 
-        if (userEmail == null){
+        if (userLogin == null){
 
         }else {
             Claims claims = Jwts.claims();
@@ -54,7 +54,7 @@ public class JwtToken {
                 claims.setSubject("user_refresh_auth");
             }else{
                 claims.setSubject("user_auth");
-                claims.setAudience(userEmail);
+                claims.setAudience(userLogin);
             }
 
             claims.setIssuedAt(now);

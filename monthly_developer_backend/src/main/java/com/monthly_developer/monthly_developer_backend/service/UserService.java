@@ -33,11 +33,13 @@ public class UserService implements UserDetailsService {
         String _result;
         Object _data;
 
-        User loginUser = userRepository.findByEmail(user.getEmail())
+        User loginUser = userRepository.findByLogin(user.getLogin())
                 .orElseGet(() -> {
                     User newUser = User.builder()
+                            .login(user.getLogin())
+                            .avatar(user.getAvatar())
                             .email(user.getEmail())
-                            .password(user.getPassword())
+                            .name(user.getName())
                             .roles(Collections.singletonList("ROLE_USER"))
                             .build();
 
@@ -47,14 +49,16 @@ public class UserService implements UserDetailsService {
                     return newUser;
                 });
 
-        if (user.getPassword().equals(loginUser.getPassword())) {
+        if (user.getLogin().equals(loginUser.getLogin())) {
 
-            UserTokens _token = jwtToken.createAllTokens(loginUser.getEmail(), loginUser.getRoles());
+            UserTokens _token = jwtToken.createAllTokens(loginUser.getLogin(), loginUser.getRoles());
 
             _result = "success";
             User newUser = User.builder()
+                    .login(user.getLogin())
+                    .avatar(user.getAvatar())
                     .email(user.getEmail())
-                    .password(user.getPassword())
+                    .name(user.getName())
                     .roles(loginUser.getRoles())
                     .token(_token.getRefreshToken())
                     .build();
@@ -157,7 +161,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        return userRepository.findByLogin(username)
                 .orElseThrow(()-> new UsernameNotFoundException("사용자를 찾을 수 없음"));
     }
 }
