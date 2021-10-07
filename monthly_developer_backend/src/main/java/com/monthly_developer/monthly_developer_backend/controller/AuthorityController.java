@@ -24,16 +24,20 @@ public class AuthorityController {
         this.oauthService = oauthService;
     }
 
+    // login or join end-point
     @PostMapping("/join")
     public ResponseEntity<ResponseMessage> join(@RequestBody GithubAccessCode githubAccessCode, HttpServletRequest request) {
 
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
-        // Get user information from Github
+        // get user information from Github
         GithubUserInfo user = oauthService.getUserInfo(githubAccessCode.getAccessCode());
-        System.out.println(user);
+
+        // validate and get token
         Map<String, Object> result = userService.joinUser(user.githubUserToUser());
+
+        // response
         responseMessage.setRequestResult((String) result.get("result"));
         responseMessage.setData(result.get("data"));
 
@@ -42,18 +46,24 @@ public class AuthorityController {
 
     }
 
+    // reissue token end-point
     @PostMapping("/reissue")
     public ResponseEntity<ResponseMessage> reissueToken(@RequestBody UserTokens userTokens, HttpServletRequest request) {
+
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
+        // validate and reissue token
         Map<String, Object> result = userService.reissueUserToken(userTokens);
+
+        // response
         responseMessage.setRequestResult((String) result.get("result"));
         responseMessage.setData(result.get("data"));
 
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
 
+    // spring security test end-point
     @GetMapping("/user/test")
     public String userTest(){
         return "user!";

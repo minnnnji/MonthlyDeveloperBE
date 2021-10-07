@@ -21,9 +21,9 @@ public class OauthService {
         this.setProperty = setProperty;
     }
 
-    public GithubUserInfo getUserInfo(String code){
+    public GithubUserInfo getUserInfo(String accessCode){
 
-        GithubAccessToken githubAccessToken = getAccessToken(code);
+        GithubAccessToken githubAccessToken = getAccessToken(accessCode);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "token " + githubAccessToken.getAccessToken());
@@ -41,14 +41,14 @@ public class OauthService {
 
     }
 
-    private GithubAccessToken getAccessToken(String code){
+    private GithubAccessToken getAccessToken(String accessCode){
 
         GithubAccessToken token = new GithubAccessToken();
 
         MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
         param.add("client_id", setProperty.getClient_id());
         param.add("client_secret", setProperty.getClient_secret());
-        param.add("code", code);
+        param.add("code", accessCode);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", "application/json");

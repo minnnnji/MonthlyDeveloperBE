@@ -14,16 +14,19 @@ public class TestController {
         this.recruitingTeamPostRepository = recruitingTeamPostRepository;
     }
 
+    // get github access code from github
     @GetMapping(value = "/login/oauth2/code/github")
     public void getUserDataFromGithub(@RequestParam String code) {
         System.out.println(code);
     }
 
+    // find all data from mdb
     @GetMapping(value = "/mongodb/findall")
     public void mongoDBFindAll(){
         System.out.println(recruitingTeamPostRepository.findAll());
     }
 
+    // write temp data to mdb
     @GetMapping(value = "/mongodb/write")
     public void mongoDBWrite(){
         RecruitingTeamPost recruitingTeamPost = RecruitingTeamPost.builder()
