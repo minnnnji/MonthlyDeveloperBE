@@ -36,5 +36,11 @@ public class TestController {
 
         recruitingTeamPostRepository.save(recruitingTeamPost);
     }
+    @GetMapping(value = "/mongodb/delete")
+    public void mongoDBDelete(){
+        recruitingTeamPostRepository.deleteById("write");
+    }
+
+
 
 }

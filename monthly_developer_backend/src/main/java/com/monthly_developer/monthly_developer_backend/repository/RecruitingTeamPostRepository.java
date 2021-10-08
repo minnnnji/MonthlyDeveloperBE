@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface RecruitingTeamPostRepository extends MongoRepository<RecruitingTeamPost, String> {
     List<RecruitingTeamPost> findAll();
+
+    void deleteById(String id);
 }
