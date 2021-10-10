@@ -32,8 +32,8 @@ public class JwtToken {
 
         UserTokens userTokens = new UserTokens();
 
-        String accessToken = createToken(userEmail, false, roles, accessTokenValidTime, now).compact();
-        String refreshToken = createToken(userEmail, true, roles, refreshTokenValidTime, now).compact();
+        String accessToken = createToken(userEmail, false, roles, accessTokenValidTime, now);
+        String refreshToken = createToken(userEmail, true, roles, refreshTokenValidTime, now);
 
         userTokens.setAccessToken(accessToken);
         userTokens.setRefreshToken(refreshToken);
@@ -41,14 +41,11 @@ public class JwtToken {
         return userTokens;
     }
 
-    private JwtBuilder createToken(String userLogin, boolean type, List<String> roles, long accessTokenValidTime, Date now) {
+    private String createToken(String userLogin, boolean type, List<String> roles, long accessTokenValidTime, Date now) {
 
-        JwtBuilder newToken = Jwts.builder();
-        newToken.setHeaderParam("typ", "JWT");
+            JwtBuilder newToken = Jwts.builder();
+            newToken.setHeaderParam("typ", "JWT");
 
-        if (userLogin == null){
-
-        }else {
             Claims claims = Jwts.claims();
             if (type){
                 claims.setSubject("user_refresh_auth");
@@ -60,11 +57,9 @@ public class JwtToken {
             claims.setIssuedAt(now);
             claims.setExpiration(new Date(now.getTime() + accessTokenValidTime));
             claims.put("roles", roles);
-
             newToken.setClaims(claims).signWith(SignatureAlgorithm.HS256, secretKey);
-        }
 
-        return newToken;
+        return newToken.compact();
     }
 
     // 정보 조회

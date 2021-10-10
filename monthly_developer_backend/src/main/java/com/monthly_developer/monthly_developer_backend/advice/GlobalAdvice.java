@@ -3,6 +3,7 @@ package com.monthly_developer.monthly_developer_backend.advice;
 import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -10,7 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import javax.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
-public class MdbControllerAdvice {
+public class GlobalAdvice {
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ResponseMessage> httpClientErrorExceptionAdvice(HttpClientErrorException e, HttpServletRequest request){
@@ -22,4 +23,5 @@ public class MdbControllerAdvice {
 
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
+
 }

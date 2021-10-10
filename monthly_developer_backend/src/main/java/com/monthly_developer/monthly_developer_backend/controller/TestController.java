@@ -20,6 +20,12 @@ public class TestController {
         System.out.println(code);
     }
 
+    // spring security test end-point
+    @GetMapping("/user/test")
+    public String userTest(){
+        return "user!";
+    }
+
     // find all data from mdb
     @GetMapping(value = "/mongodb/findall")
     public void mongoDBFindAll(){

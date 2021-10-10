@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class UserService implements UserDetailsService {
+public class TokenService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final JwtToken jwtToken;
 
 
-    public UserService(UserRepository userRepository, JwtToken jwtToken) {
+    public TokenService(UserRepository userRepository, JwtToken jwtToken) {
         this.userRepository = userRepository;
         this.jwtToken = jwtToken;
     }
@@ -125,7 +125,8 @@ public class UserService implements UserDetailsService {
 
                 if (requestUser.getToken().equals(userTokens.getRefreshToken())){
                     _result = "success";
-                    _data = jwtToken.createAllTokens(requestUser.getEmail(), requestUser.getRoles());
+                    _data = jwtToken.createAllTokens(requestUser.getLogin(), requestUser.getRoles());
+
                 }else{
                     _result = "fail!";
                     _data = "Unknown Token!";

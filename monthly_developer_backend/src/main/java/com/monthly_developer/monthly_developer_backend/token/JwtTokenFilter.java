@@ -2,7 +2,7 @@ package com.monthly_developer.monthly_developer_backend.token;
 
 
 import com.monthly_developer.monthly_developer_backend.model.user.User;
-import com.monthly_developer.monthly_developer_backend.service.UserService;
+import com.monthly_developer.monthly_developer_backend.service.TokenService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
@@ -17,11 +17,11 @@ import java.io.IOException;
 public class JwtTokenFilter extends GenericFilterBean {
 
     private final JwtToken jwtToken;
-    private final UserService userService;
+    private final TokenService tokenService;
 
-    public JwtTokenFilter(JwtToken jwtToken, UserService userService) {
+    public JwtTokenFilter(JwtToken jwtToken, TokenService tokenService) {
         this.jwtToken = jwtToken;
-        this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class JwtTokenFilter extends GenericFilterBean {
         if (token != null && jwtToken.validateToken(token)) {
 
             String userAudience = jwtToken.getUserInfo(token);
-            User requestUser = userService.loadUserByUsername(userAudience);
+            User requestUser = tokenService.loadUserByUsername(userAudience);
 
             Authentication authentication = jwtToken.getAuthentication(requestUser);
             SecurityContextHolder.getContext().setAuthentication(authentication);

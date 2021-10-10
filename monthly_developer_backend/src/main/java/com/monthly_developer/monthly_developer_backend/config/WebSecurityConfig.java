@@ -1,6 +1,7 @@
 package com.monthly_developer.monthly_developer_backend.config;
 
-import com.monthly_developer.monthly_developer_backend.service.UserService;
+import com.monthly_developer.monthly_developer_backend.advice.CustomAuthenticationEntryPoint;
+import com.monthly_developer.monthly_developer_backend.service.TokenService;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
 import com.monthly_developer.monthly_developer_backend.token.JwtTokenFilter;
 import org.springframework.context.annotation.Bean;
@@ -17,11 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtToken jwtToken;
-    private final UserService userService;
+    private final TokenService tokenService;
+    private final CustomAuthenticationEntryPoint CustomAuthenticationEntryPoint;
 
-    public WebSecurityConfig(JwtToken jwtToken, UserService userService) {
+    public WebSecurityConfig(JwtToken jwtToken, TokenService tokenService, CustomAuthenticationEntryPoint CustomAuthenticationEntryPoint) {
         this.jwtToken = jwtToken;
-        this.userService = userService;
+        this.tokenService = tokenService;
+        this.CustomAuthenticationEntryPoint = CustomAuthenticationEntryPoint;
     }
 
     @Bean
@@ -41,9 +44,13 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasRole("USER")
                 .anyRequest().permitAll()
+                .and()// 권한 거부 시
+                .exceptionHandling().authenticationEntryPoint(CustomAuthenticationEntryPoint)
                 .and()
-                .addFilterBefore(new JwtTokenFilter(jwtToken, userService),
-                        UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
+                .addFilterBefore(new JwtTokenFilter(jwtToken, tokenService),
+                        UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가;
+
+
     }
 
 }
