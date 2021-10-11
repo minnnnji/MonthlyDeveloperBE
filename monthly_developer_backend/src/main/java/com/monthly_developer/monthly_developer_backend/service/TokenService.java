@@ -4,17 +4,20 @@ import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService implements UserDetailsService {
@@ -22,6 +25,8 @@ public class TokenService implements UserDetailsService {
     private final UserRepository userRepository;
     private final JwtToken jwtToken;
 
+    private String _result = null;
+    private Object _data = null;
 
     public TokenService(UserRepository userRepository, JwtToken jwtToken) {
         this.userRepository = userRepository;
@@ -30,9 +35,8 @@ public class TokenService implements UserDetailsService {
 
     public Map<String, Object> joinUser(User user){
 
-        String _result;
-        Object _data;
-
+        // 사용자의 별명을 토대로 DB에서 정보를 가져옴
+        // 단, 사용자가 없을 경우 새로운 사용자로 추가
         User loginUser = userRepository.findByLogin(user.getLogin())
                 .orElseGet(() -> {
                     User newUser = User.builder()
@@ -49,6 +53,7 @@ public class TokenService implements UserDetailsService {
                     return newUser;
                 });
 
+        // 사용자의 별명이 동일한지 확인
         if (user.getLogin().equals(loginUser.getLogin())) {
 
             UserTokens _token = jwtToken.createAllTokens(loginUser.getLogin(), loginUser.getRoles());
@@ -71,31 +76,29 @@ public class TokenService implements UserDetailsService {
             _data = null;
         }
 
-        String final_result = _result;
-        Object final_data = _data;
         return new HashMap<String, Object>() {{
-            put("result", final_result);
-            put("data", final_data);
+            put("result", _result);
+            put("data", _data);
         }};
     }
 
-    public Map<String, Object> reissueUserToken(UserTokens userTokens){
+    public HashMap<String, Object> reissueUserToken(UserTokens userTokens){
 
-        String _result;
-        Object _data;
 
-        //        // ID
-        //        System.out.println(token.getPrincipal());
-        //        // PW
-        //        System.out.println(token.getCredentials());
-        //        // Detail
-        //        System.out.println(token.getDetails());
-        //        // Auth
-        //        System.out.println(token.getAuthorities());
-        //
-        //        System.out.println();
-        //
-        //        System.out.println(token.getName());
+        /* Authentication 관련 참고 함수
+
+        // ID
+        System.out.println(token.getPrincipal());
+        // PW
+        System.out.println(token.getCredentials());
+        // Detail
+        System.out.println(token.getDetails());
+        // Auth
+        System.out.println(token.getAuthorities());
+        // Name
+        System.out.println(token.getName());
+
+         */
 
         try {
             String userAudience = jwtToken.getUserInfo(userTokens.getAccessToken());
@@ -106,7 +109,6 @@ public class TokenService implements UserDetailsService {
             _data = "Access Token is not expired.";
 
             // 사인 오류
-
         } catch (SignatureException e) {
             _result = "fail";
             _data = "SignatureException";
@@ -150,11 +152,9 @@ public class TokenService implements UserDetailsService {
 
         }
 
-        String final_result = _result;
-        Object final_data = _data;
-        return new HashMap() {{
-            put("result", final_result);
-            put("data", final_data);
+        return new HashMap<String, Object>() {{
+            put("result", _result);
+            put("data", _data);
         }};
 
     }

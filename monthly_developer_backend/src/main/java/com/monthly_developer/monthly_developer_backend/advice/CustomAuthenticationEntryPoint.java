@@ -29,7 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         responseMessage.setRequestPath(request.getRequestURI());
         responseMessage.setRequestResult("fail");
-        responseMessage.setData("AUTH Denied!");
+        responseMessage.setData("ROLE Denied");
 
         String json = new ObjectMapper().writeValueAsString(responseMessage);
 

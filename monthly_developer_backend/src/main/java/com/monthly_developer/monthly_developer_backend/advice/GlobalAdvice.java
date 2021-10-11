@@ -3,7 +3,6 @@ package com.monthly_developer.monthly_developer_backend.advice;
 import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,7 +18,7 @@ public class GlobalAdvice {
 
         responseMessage.setRequestPath(request.getRequestURI());
         responseMessage.setRequestResult("fail");
-        responseMessage.setData("Auth Error");
+        responseMessage.setData("Github Oauth Error");
 
         return new ResponseEntity<>(responseMessage, HttpStatus.OK);
     }
