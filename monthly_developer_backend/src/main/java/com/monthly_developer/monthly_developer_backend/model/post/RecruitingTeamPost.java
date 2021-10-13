@@ -9,7 +9,7 @@ import javax.persistence.Id;
 @Builder
 public class RecruitingTeamPost {
     @Id
-    private String id;
+    private int id;
     private String title;
     private String writer;
     private String date;
