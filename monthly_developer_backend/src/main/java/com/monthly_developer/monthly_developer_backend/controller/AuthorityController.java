@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+// 인증과 관련된 작업을 하는 Controller
 @RestController
 public class AuthorityController {
 
@@ -24,20 +25,20 @@ public class AuthorityController {
         this.oauthService = oauthService;
     }
 
-    // login or join end-point
+    // 사용자가 로그인 혹은 회원가입 시 접근하게 되는 엔드 포인트
     @PostMapping("/oauth")
     public ResponseEntity<ResponseMessage> join(@RequestBody GithubAccessCode githubAccessCode, HttpServletRequest request) {
 
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
-        // get user information from Github
+        // 전달 받은 Github의 AccessCode를 토대로 정보 요청
         GithubUserInfo user = oauthService.getUserInfo(githubAccessCode.getAccessCode());
 
-        // validate and get token
+        // 서비스에서 활용할 토큰 생성
         Map<String, Object> result = tokenService.joinUser(user.githubUserToUser());
 
-        // response
+        // 결과 응답 내용 추가
         responseMessage.setRequestResult((String) result.get("result"));
         responseMessage.setData(result.get("data"));
 
@@ -46,17 +47,17 @@ public class AuthorityController {
 
     }
 
-    // reissue token end-point
+    // 토큰이 만료 되었을 때 갱신을 위한 엔드 포인트
     @PostMapping("/reissue-token")
     public ResponseEntity<ResponseMessage> reissueToken(@RequestBody UserTokens userTokens, HttpServletRequest request) {
 
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setRequestPath(request.getRequestURI());
 
-        // validate and reissue token
+        // 토큰 검증
         Map<String, Object> result = tokenService.reissueUserToken(userTokens);
 
-        // response
+        // 결과 응답 내용 추가
         responseMessage.setRequestResult((String) result.get("result"));
         responseMessage.setData(result.get("data"));
 
