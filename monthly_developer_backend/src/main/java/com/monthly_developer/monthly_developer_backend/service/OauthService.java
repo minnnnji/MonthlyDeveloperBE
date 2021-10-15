@@ -21,14 +21,17 @@ public class OauthService {
         this.setProperty = setProperty;
     }
 
+    // 전달받은 AccessCode를 Github으로 보내 사용자 정보를 가져오는 메소드
+    // github 닉네임, 이메일, 이름, 프로필 사진을 가져온다.
     public GithubUserInfo getUserInfo(String accessCode){
 
+        // 정보를 받아오기 위해서는 AccessCode로 AccessToken을 받급받음
         GithubAccessToken githubAccessToken = getAccessToken(accessCode);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "token " + githubAccessToken.getAccessToken());
 
-        HttpEntity httpEntity = new HttpEntity<>(headers);
+        HttpEntity<HttpHeaders> httpEntity = new HttpEntity<>(headers);
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -41,6 +44,7 @@ public class OauthService {
 
     }
 
+    // AccessCode로 AccessToken을 받급 받는 메소드
     private GithubAccessToken getAccessToken(String accessCode){
 
         GithubAccessToken token = new GithubAccessToken();
@@ -53,7 +57,7 @@ public class OauthService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Accept", "application/json");
 
-        HttpEntity httpEntity = new HttpEntity<>(param, headers);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(param, headers);
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<GithubAccessToken> res = restTemplate.exchange("https://github.com/login/oauth/access_token",
