@@ -86,7 +86,7 @@ public class TokenService implements UserDetailsService {
 
 
         /* Authentication 관련 참고 함수
-
+        Authentication token = jwtToken.getAuthentication(requestUser);
         // ID
         System.out.println(token.getPrincipal());
         // PW
@@ -100,13 +100,20 @@ public class TokenService implements UserDetailsService {
 
          */
 
+        /*
+           access token 가 Expired 되었는지 확인 및 정보 조회
+        */
+
         try {
+
+            // access token에서 정보를 가져옴
+            // 만약 만료일이 넘었거나 유효하지 않다면 catch 로 통과
             String userAudience = jwtToken.getUserInfo(userTokens.getAccessToken());
             User requestUser = loadUserByUsername(userAudience);
-            Authentication token = jwtToken.getAuthentication(requestUser);
 
-            _result = "fail";
-            _data = "Access Token is not expired.";
+            // refresh token 을 검증하고 token 을 갱신
+            validateAndReissueToken(userTokens, requestUser);
+
 
             // 사인 오류
         } catch (SignatureException e) {
@@ -122,29 +129,23 @@ public class TokenService implements UserDetailsService {
         } catch (ExpiredJwtException e) {
 
             try {
-                String expiredUserMail = e.getClaims().getAudience();
-                User requestUser = loadUserByUsername(expiredUserMail);
+                // 만료일이 지난 경우 Expired 된 access token 에서 정보를 가져와 갱신 작업
+                String expiredUserAudience = e.getClaims().getAudience();
+                User requestUser = loadUserByUsername(expiredUserAudience);
 
-                if (requestUser.getToken().equals(userTokens.getRefreshToken())){
-                    _result = "success";
-                    _data = jwtToken.createAllTokens(requestUser.getLogin(), requestUser.getRoles());
+                validateAndReissueToken(userTokens, requestUser);
 
-                }else{
-                    _result = "fail!";
-                    _data = "Unknown Token!";
-                }
-
-            } catch (io.jsonwebtoken.SignatureException ie) {
+            } catch (SignatureException ie) {
                 _result = "fail";
                 _data = "SignatureException";
 
                 // 파싱 오류
-            } catch (io.jsonwebtoken.MalformedJwtException ie) {
+            } catch (MalformedJwtException ie) {
                 _result = "fail";
                 _data = "MalformedJwtException";
 
                 // 타임 아웃
-            } catch (io.jsonwebtoken.ExpiredJwtException ie) {
+            } catch (ExpiredJwtException ie) {
                 _result = "fail";
                 _data = "All Token Time out!";
             }
@@ -157,6 +158,31 @@ public class TokenService implements UserDetailsService {
             put("data", _data);
         }};
 
+    }
+
+    private void validateAndReissueToken(UserTokens userTokens, User requestUser) {
+        // refresh token 검증
+        if(requestUser.getToken().equals(userTokens.getRefreshToken())){
+            _result = "success";
+
+            UserTokens newToken = jwtToken.createAllTokens(requestUser.getLogin(), requestUser.getRoles());
+
+            // db 내에 refresh token 검증
+            User reissueUserInfo = User.builder()
+                    .login(requestUser.getLogin())
+                    .avatar(requestUser.getAvatar())
+                    .email(requestUser.getEmail())
+                    .name(requestUser.getName())
+                    .token(newToken.getRefreshToken())
+                    .build();
+
+            userRepository.save(reissueUserInfo);
+
+            _data = newToken;
+        }else{
+            _result = "fail";
+            _data = "Unknown Token!";
+        }
     }
 
 
