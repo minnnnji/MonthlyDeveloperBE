@@ -127,7 +127,7 @@ public class TokenService implements UserDetailsService {
 
             // 타임 아웃
         } catch (ExpiredJwtException e) {
-
+            System.out.println("is time out!");
             try {
                 // 만료일이 지난 경우 Expired 된 access token 에서 정보를 가져와 갱신 작업
                 String expiredUserAudience = e.getClaims().getAudience();
