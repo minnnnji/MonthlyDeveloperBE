@@ -1,12 +1,15 @@
 package com.monthly_developer.monthly_developer_backend.token;
 
+import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.Authentication;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,6 +38,28 @@ public class JwtTokenTest {
         assertNotNull(userTokens.getAccessToken());
         assertNotNull(userTokens.getRefreshToken());
         assertEquals(jwtToken.getUserInfo(userTokens.getAccessToken()), "testLogin");
+    }
+
+    @Test
+    @DisplayName("전달 받은 User 에 대한 정보 조회")
+    void getAuthenticationTest(){
+        //given
+        User user = User.builder()
+                .login("testLogin")
+                .avatar("http://testAvatarURL")
+                .email("test@test.com")
+                .name("testName")
+                .roles(Collections.singletonList("ROLE_USER"))
+                .build();
+
+        // when
+        Authentication authentication = jwtToken.getAuthentication(user);
+
+        // then
+        assertNotNull(authentication);
+        assertEquals(authentication.getPrincipal(), user);
+        assertEquals(authentication.getCredentials(), "");
+        assertEquals(authentication.getAuthorities(), user.getAuthorities());
     }
 
 }
