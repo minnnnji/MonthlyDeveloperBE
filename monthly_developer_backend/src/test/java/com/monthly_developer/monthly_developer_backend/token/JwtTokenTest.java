@@ -4,6 +4,9 @@ import com.monthly_developer.monthly_developer_backend.model.user.User;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
@@ -60,6 +63,45 @@ public class JwtTokenTest {
         assertEquals(authentication.getPrincipal(), user);
         assertEquals(authentication.getCredentials(), "");
         assertEquals(authentication.getAuthorities(), user.getAuthorities());
+    }
+
+    @Test
+    @DisplayName("전달 받은 Token에서 Audience를 추출")
+    void getUserInfoTest(){
+        //given
+        String userEmail = "testLogin";
+        List<String> roles = new ArrayList<>(){
+            {
+                add("ROLE_USER");
+            }
+        };
+        UserTokens userTokens = jwtToken.createAllTokens(userEmail, roles);
+
+        // when
+        String userAudience = jwtToken.getUserInfo(userTokens.getAccessToken());
+
+        // then
+        assertNotNull(userAudience);
+        assertEquals(userAudience, userEmail);
+    }
+
+    @Test
+    @DisplayName("Token 만료 확인")
+    void validateTokenTest(){
+        //given
+        String userEmail = "testLogin";
+        List<String> roles = new ArrayList<>(){
+            {
+                add("ROLE_USER");
+            }
+        };
+        UserTokens userTokens = jwtToken.createAllTokens(userEmail, roles);
+
+        // when
+        boolean isExpired = jwtToken.validateToken(userTokens.getAccessToken());
+
+        // then
+        assertTrue(isExpired);
     }
 
 }
