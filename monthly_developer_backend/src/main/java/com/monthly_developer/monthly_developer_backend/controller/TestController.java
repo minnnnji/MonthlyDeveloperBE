@@ -9,6 +9,9 @@ import com.monthly_developer.monthly_developer_backend.repository.CounterReposit
 import com.monthly_developer.monthly_developer_backend.repository.RecruitingTeamPostRepository;
 import com.monthly_developer.monthly_developer_backend.repository.UserRepository;
 import com.monthly_developer.monthly_developer_backend.token.JwtToken;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.SwaggerDefinition;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +26,8 @@ import java.util.Map;
     해당 Controller 는 새로운 기능 테스트, 적용을 위해 사용하는 Controller 임
 */
 
-
 @RestController
+@Api(description = "테스트를 위한 API 목록")
 public class TestController {
 
     private final RecruitingTeamPostRepository recruitingTeamPostRepository;

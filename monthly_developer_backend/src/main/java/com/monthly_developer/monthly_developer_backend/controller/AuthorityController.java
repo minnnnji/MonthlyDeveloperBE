@@ -6,6 +6,7 @@ import com.monthly_developer.monthly_developer_backend.model.ResponseMessage;
 import com.monthly_developer.monthly_developer_backend.model.user.UserTokens;
 import com.monthly_developer.monthly_developer_backend.service.OauthService;
 import com.monthly_developer.monthly_developer_backend.service.TokenService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class AuthorityController {
     }
 
     // 사용자가 로그인 혹은 회원가입 시 접근하게 되는 엔드 포인트
+    @ApiOperation("oauth를 활용한 로그인")
     @PostMapping("/oauth")
     public ResponseEntity<ResponseMessage> join(@RequestBody GithubAccessCode githubAccessCode, HttpServletRequest request) {
 
@@ -48,6 +50,7 @@ public class AuthorityController {
     }
 
     // 토큰이 만료 되었을 때 갱신을 위한 엔드 포인트
+    @ApiOperation("토큰 재발급")
     @PostMapping("/reissue-token")
     public ResponseEntity<ResponseMessage> reissueToken(@RequestBody UserTokens userTokens, HttpServletRequest request) {
 
