@@ -3,3 +3,5 @@
 */logs/*
 .DS_Store
 SetProperty.java
+*/__pycache__/*
+*.pyc
